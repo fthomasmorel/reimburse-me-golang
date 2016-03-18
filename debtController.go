@@ -31,8 +31,6 @@ func GetTheirDebtsController(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-// UpdateEventController will answer the JSON
-// of the brand new modified event from the JSON body
 func CreateDebtController(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var debt Debt
@@ -48,6 +46,12 @@ func DeleteDebtController(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	debt := DeleteDebt(bson.ObjectIdHex(vars["id"]))
 	json.NewEncoder(w).Encode(debt)
+}
+
+func ReimburseDebtController(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	res := ReimburseDebt(bson.ObjectIdHex(vars["id"]))
+	json.NewEncoder(w).Encode(res)
 }
 
 func AddImageDebtController(w http.ResponseWriter, r *http.Request) {

@@ -16,6 +16,7 @@ type Debt struct {
 	Payer       bson.ObjectId `json:"payer"`  //the guy who paid
 	Date        time.Time     `json:"date"`
 	PhotoURL    string        `json:"photoURL"`
+	Reimbursed  time.Time     `json:"reimbursed"`
 }
 
 // Debts is an array of Debts
@@ -62,6 +63,7 @@ func CreateDebt(debt Debt) Debt {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	db := session.DB("reimburse-me").C("debt")
+	debt.Date = time.Now()
 	db.Insert(debt)
 	var result Debt
 	db.Find(bson.M{"title": debt.Title, "date": debt.Date}).One(&result)
@@ -77,6 +79,21 @@ func DeleteDebt(id bson.ObjectId) Debt {
 	db.Remove(bson.M{"_id": id})
 	var debt Debt
 	db.Find(id).One(&debt)
+	return debt
+}
+
+func ReimburseDebt(id bson.ObjectId) Debt {
+	session, _ := mgo.Dial("127.0.0.1")
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	db := session.DB("reimburse-me").C("debt")
+	debtID := bson.M{"_id": id}
+	change := bson.M{"$set": bson.M{
+		"reimbursed": time.Now(),
+	}}
+	db.Update(debtID, change)
+	var debt Debt
+	db.FindId(id).One(&debt)
 	return debt
 }
 

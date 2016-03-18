@@ -36,10 +36,11 @@ var routes = Routes{
 	Route{"GetDebt", "GET", "/debt/{id}", GetDebtController},
 	Route{"DeleteDebt", "DELETE", "/debt/{id}", DeleteDebtController},
 	Route{"AddImageDebt", "POST", "/debt/{id}/image", AddImageDebtController},
+	Route{"ReimburseDebt", "PUT", "/debt/{id}", ReimburseDebtController},
 
 	//User + Debt
-	Route{"GetMyDebts", "GET", "/user{userID}/debt", GetMyDebtsController},
-	Route{"GetTheirDebts", "GET", "/user{userID}/debt", GetTheirDebtsController},
+	Route{"GetMyDebts", "GET", "/user/{userID}/mydebt", GetMyDebtsController},
+	Route{"GetTheirDebts", "GET", "/user/{userID}/debt", GetTheirDebtsController},
 	Route{"CreateDebt", "POST", "/user/{userID}/debt", CreateDebtController},
 
 	//User
@@ -48,5 +49,5 @@ var routes = Routes{
 	Route{"CreateUser", "POST", "/user", CreateUserController},
 	Route{"DeleteUser", "DELETE", "/user/{id}", DeleteUserController},
 	Route{"AddPayee", "POST", "/user/{id}/payee/{payeeID}", AddPayeeController},
-	Route{"RemovePayee", "DELETE", "/user/payee/{payeeID}", RemovePayeeController},
+	Route{"RemovePayee", "DELETE", "/user/{id}/payee/{payeeID}", RemovePayeeController},
 }

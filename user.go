@@ -30,6 +30,8 @@ func GetUser(id bson.ObjectId) User {
 	db := session.DB("reimburse-me").C("user")
 	var result User
 	db.FindId(id).One(&result)
+	result.Token = ""
+	//result.Payees = []bson.ObjectId{} problem with public content
 	return result
 }
 
@@ -40,7 +42,7 @@ func CreateUser(user User) User {
 	session.SetMode(mgo.Monotonic, true)
 	db := session.DB("reimburse-me").C("user")
 	token, _ := exec.Command("uuidgen").Output()
-	user.Token = string(token)
+	user.Token = string(token[:])
 	db.Insert(user)
 	var result User
 	db.Find(bson.M{"username": user.Username}).One(&result)
