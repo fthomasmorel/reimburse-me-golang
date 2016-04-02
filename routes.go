@@ -50,4 +50,7 @@ var routes = Routes{
 	Route{"DeleteUser", "DELETE", "/user/{id}", DeleteUserController},
 	Route{"AddPayee", "POST", "/user/{id}/payee/{payeeID}", AddPayeeController},
 	Route{"RemovePayee", "DELETE", "/user/{id}/payee/{payeeID}", RemovePayeeController},
+
+	//Notification
+	Route{"GetNotification", "GET", "/user/{id}/notification", GetNotificationController},
 }
