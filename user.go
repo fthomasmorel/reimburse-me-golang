@@ -2,6 +2,9 @@ package main
 
 import (
 	"os/exec"
+	"strings"
+
+	"github.com/freehaha/token-auth/memory"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -17,9 +20,8 @@ type User struct {
 }
 
 // LogUser returns a session token
-func LogUser(id bson.ObjectId, token string) string {
-	///....
-	return "fdsqjkm"
+func LogUser(id bson.ObjectId) *memstore.MemoryToken {
+	return memStore.NewToken(string(id))
 }
 
 // GetUserFromUsername returns an user object from the given ID
@@ -44,7 +46,18 @@ func GetUser(id bson.ObjectId) User {
 	var result User
 	db.FindId(id).One(&result)
 	result.Token = ""
-	//result.Payees = []bson.ObjectId{} problem with public content
+	return result
+}
+
+// GetUser returns an user object from the given ID
+func GetUserWithToken(id bson.ObjectId) User {
+	session, _ := mgo.Dial("127.0.0.1")
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	db := session.DB("reimburse-me").C("user")
+	var result User
+	db.FindId(id).One(&result)
+	result.Payees = []bson.ObjectId{}
 	return result
 }
 
@@ -55,7 +68,7 @@ func CreateUser(user User) User {
 	session.SetMode(mgo.Monotonic, true)
 	db := session.DB("reimburse-me").C("user")
 	token, _ := exec.Command("uuidgen").Output()
-	user.Token = string(token[:])
+	user.Token = strings.Trim(string(token), "\n")
 	db.Insert(user)
 	var result User
 	db.Find(bson.M{"username": user.Username}).One(&result)

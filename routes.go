@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 
+	"github.com/freehaha/token-auth"
+	"github.com/freehaha/token-auth/memory"
 	"github.com/gorilla/mux"
 )
 
@@ -20,15 +22,31 @@ type Routes []Route
 // NewRouter is the constructeur of the Router
 // It will create every routes from the routes variable just above
 func NewRouter() *mux.Router {
+	tokenAuth := tauth.NewTokenAuth(nil, nil, memStore, nil)
 	router := mux.NewRouter().StrictSlash(true)
-	for _, route := range routes {
+
+	for _, route := range publicRoutes {
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
 			Handler(route.HandlerFunc)
 	}
+
+	for _, route := range routes {
+		router.
+			Methods(route.Method).
+			Path(route.Pattern).
+			Name(route.Name).
+			Handler(tokenAuth.HandleFunc(route.HandlerFunc))
+	}
 	return router
+}
+
+var memStore = memstore.New("salty")
+
+var publicRoutes = Routes{
+	Route{"LogUser", "GET", "/user/{id}/login/{token}", LogUserController},
 }
 
 var routes = Routes{
@@ -44,7 +62,6 @@ var routes = Routes{
 	Route{"CreateDebt", "POST", "/user/{userID}/debt", CreateDebtController},
 
 	//User
-	Route{"LogUser", "GET", "/user/{id}/login", LogUserController},
 	Route{"GetUser", "GET", "/user/{id}", GetUserController},
 	Route{"CreateUser", "POST", "/user", CreateUserController},
 	Route{"DeleteUser", "DELETE", "/user/{id}", DeleteUserController},

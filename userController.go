@@ -11,11 +11,17 @@ import (
 )
 
 func LogUserController(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
-	var user User
-	decoder.Decode(&user)
-	token := LogUser(user.ID, user.Token)
-	fmt.Fprintln(w, token)
+	vars := mux.Vars(r)
+	user := GetUserWithToken(bson.ObjectIdHex(vars["id"]))
+	token := vars["token"]
+	fmt.Println(token)
+	fmt.Println(user.Token)
+	if user.Token == token {
+		sessionToken := LogUser(user.ID)
+		json.NewEncoder(w).Encode(bson.M{"token": sessionToken})
+	} else {
+		json.NewEncoder(w).Encode(bson.M{"errorr": "wrong id"})
+	}
 }
 
 func GetUserController(w http.ResponseWriter, r *http.Request) {
