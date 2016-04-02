@@ -68,6 +68,7 @@ func CreateDebt(debt Debt) Debt {
 	db.Insert(debt)
 	var result Debt
 	db.Find(bson.M{"title": debt.Title, "date": debt.Date}).One(&result)
+	AddNewDebtNotification(result)
 	return result
 }
 
@@ -95,6 +96,7 @@ func ReimburseDebt(id bson.ObjectId) Debt {
 	db.Update(debtID, change)
 	var debt Debt
 	db.FindId(id).One(&debt)
+	AddReimbursedNotification(debt)
 	return debt
 }
 
