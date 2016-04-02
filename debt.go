@@ -17,7 +17,7 @@ type Debt struct {
 	Payer       bson.ObjectId `json:"payer"`  //the guy who paid
 	Date        time.Time     `json:"date"`
 	PhotoURL    string        `json:"photoURL"`
-	Reimbursed  time.Time     `bson:"reimbursed,omitempty", json:"reimbursed,omitempty"`
+	Reimbursed  time.Time     `bson:"reimbursed,omitempty"`
 }
 
 // Debts is an array of Debts
@@ -95,6 +95,7 @@ func ReimburseDebt(id bson.ObjectId) Debt {
 	db.Update(debtID, change)
 	var debt Debt
 	db.FindId(id).One(&debt)
+	AddReimbursedNotification(debt)
 	return debt
 }
 
@@ -111,5 +112,6 @@ func AddImageDebt(id bson.ObjectId, fileName string) Debt {
 	db.Update(eventID, change)
 	var result Debt
 	db.FindId(id).One(&result)
+	AddNewDebtNotification(result)
 	return result
 }
