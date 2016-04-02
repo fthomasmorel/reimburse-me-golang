@@ -21,8 +21,14 @@ func LogUserController(w http.ResponseWriter, r *http.Request) {
 func GetUserController(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["id"]
-	var res = GetUser(bson.ObjectIdHex(userID))
-	json.NewEncoder(w).Encode(res)
+	if len(userID) > 15 {
+		var res = GetUser(bson.ObjectIdHex(userID))
+		json.NewEncoder(w).Encode(res)
+	} else {
+		var res = GetUserFromUsername(userID)
+		json.NewEncoder(w).Encode(res)
+	}
+
 }
 
 func CreateUserController(w http.ResponseWriter, r *http.Request) {

@@ -57,6 +57,7 @@ func ReimburseDebtController(w http.ResponseWriter, r *http.Request) {
 func AddImageDebtController(w http.ResponseWriter, r *http.Request) {
 	fileName := UploadImage(r)
 	if fileName == "error" {
+		fmt.Println("wrong file name")
 		w.Header().Set("status", "400")
 		fmt.Fprintln(w, "{}")
 	} else {

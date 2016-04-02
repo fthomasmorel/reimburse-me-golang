@@ -12,11 +12,12 @@ type Debt struct {
 	ID          bson.ObjectId `bson:"_id,omitempty"`
 	Title       string        `json:"title"`
 	Description string        `json:"description"`
+	Amount      float32       `json:"amount"`
 	Payee       bson.ObjectId `json:"payee" ` //the guy who has to reimburse
 	Payer       bson.ObjectId `json:"payer"`  //the guy who paid
 	Date        time.Time     `json:"date"`
 	PhotoURL    string        `json:"photoURL"`
-	Reimbursed  time.Time     `json:"reimbursed"`
+	Reimbursed  time.Time     `bson:"reimbursed,omitempty", json:"reimbursed,omitempty"`
 }
 
 // Debts is an array of Debts
@@ -104,11 +105,11 @@ func AddImageDebt(id bson.ObjectId, fileName string) Debt {
 	session.SetMode(mgo.Monotonic, true)
 	db := session.DB("reimburse-me").C("debt")
 	eventID := bson.M{"_id": id}
-	change := bson.M{
-		"photoUrl": fileName,
-	}
+	change := bson.M{"$set": bson.M{
+		"photourl": fileName + ".png",
+	}}
 	db.Update(eventID, change)
 	var result Debt
-	db.Find(bson.M{"_id": id}).One(&result)
+	db.FindId(id).One(&result)
 	return result
 }

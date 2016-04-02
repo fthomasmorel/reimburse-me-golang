@@ -22,6 +22,19 @@ func LogUser(id bson.ObjectId, token string) string {
 	return "fdsqjkm"
 }
 
+// GetUserFromUsername returns an user object from the given ID
+func GetUserFromUsername(username string) User {
+	session, _ := mgo.Dial("127.0.0.1")
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	db := session.DB("reimburse-me").C("user")
+	var result User
+	db.Find(bson.M{"username": username}).One(&result)
+	result.Token = ""
+	//result.Payees = []bson.ObjectId{} problem with public content
+	return result
+}
+
 // GetUser returns an user object from the given ID
 func GetUser(id bson.ObjectId) User {
 	session, _ := mgo.Dial("127.0.0.1")
